@@ -1,0 +1,47 @@
+plugins {
+  id 'application'
+  id 'vontikov.sbe-generator-plugin' version '0.0.3'
+  id 'eclipse'
+  id 'idea'
+}
+
+dependencies {
+  // SBE codecs depends on it
+  implementation 'org.agrona:agrona:1.4.1'
+}
+
+sbeGenerator {
+  src {
+    dir = 'src/main/resources/schemas'
+  }
+
+  // Java codecs dir 
+  javaCodecsDir = 'src/generated/java'
+  // SBE options: see https://github.com/real-logic/simple-binary-encoding/wiki/Sbe-Tool-Guide
+  javaOptions = ['sbe.java.generate.interfaces': 'true']
+}
+
+sourceSets {
+  main {
+    java {
+      // default Gradle layout
+      srcDirs = ['src/main/java/']
+      // generated SBE stubs
+      srcDir 'src/generated/java'
+    }
+  }
+}
+
+task fatJar(type: Jar) {
+  manifest {
+    attributes 'Main-Class': 'uk.co.real_logic.sbe.examples.ExampleUsingGeneratedStub'
+  }
+  archiveClassifier = "all"
+  from {
+    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+  }
+  with jar
+}
+
+defaultTasks 'clean', 'fatJar'
