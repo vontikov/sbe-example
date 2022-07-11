@@ -1,4 +1,4 @@
-/* Generated SBE (Simple Binary Encoding) message codec */
+/* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
@@ -110,14 +110,24 @@ public class VarStringEncodingEncoder implements CompositeEncoderFlyweight
 
     public String toString()
     {
-        return appendTo(new StringBuilder(100)).toString();
+        if (null == buffer)
+        {
+            return "";
+        }
+
+        return appendTo(new StringBuilder()).toString();
     }
 
     public StringBuilder appendTo(final StringBuilder builder)
     {
-        VarStringEncodingDecoder writer = new VarStringEncodingDecoder();
-        writer.wrap(buffer, offset);
+        if (null == buffer)
+        {
+            return builder;
+        }
 
-        return writer.appendTo(builder);
+        final VarStringEncodingDecoder decoder = new VarStringEncodingDecoder();
+        decoder.wrap(buffer, offset);
+
+        return decoder.appendTo(builder);
     }
 }

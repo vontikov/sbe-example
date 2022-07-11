@@ -1,4 +1,4 @@
-/* Generated SBE (Simple Binary Encoding) message codec */
+/* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
@@ -183,16 +183,16 @@ public class EngineEncoder implements CompositeEncoderFlyweight
             throw new IndexOutOfBoundsException("index out of range: index=" + index);
         }
 
-        final int pos = this.offset + 3 + (index * 1);
+        final int pos = offset + 3 + (index * 1);
         buffer.putByte(pos, value);
 
         return this;
     }
     public EngineEncoder putManufacturerCode(final byte value0, final byte value1, final byte value2)
     {
-        buffer.putByte(this.offset + 3, value0);
-        buffer.putByte(this.offset + 4, value1);
-        buffer.putByte(this.offset + 5, value2);
+        buffer.putByte(offset + 3, value0);
+        buffer.putByte(offset + 4, value1);
+        buffer.putByte(offset + 5, value2);
 
         return this;
     }
@@ -210,7 +210,7 @@ public class EngineEncoder implements CompositeEncoderFlyweight
             throw new IndexOutOfBoundsException("Copy will go out of range: offset=" + srcOffset);
         }
 
-        buffer.putBytes(this.offset + 3, src, srcOffset, length);
+        buffer.putBytes(offset + 3, src, srcOffset, length);
 
         return this;
     }
@@ -224,11 +224,11 @@ public class EngineEncoder implements CompositeEncoderFlyweight
             throw new IndexOutOfBoundsException("String too large for copy: byte length=" + srcLength);
         }
 
-        buffer.putStringWithoutLengthAscii(this.offset + 3, src);
+        buffer.putStringWithoutLengthAscii(offset + 3, src);
 
         for (int start = srcLength; start < length; ++start)
         {
-            buffer.putByte(this.offset + 3 + start, (byte)0);
+            buffer.putByte(offset + 3 + start, (byte)0);
         }
 
         return this;
@@ -247,12 +247,12 @@ public class EngineEncoder implements CompositeEncoderFlyweight
         {
             final char charValue = src.charAt(i);
             final byte byteValue = charValue > 127 ? (byte)'?' : (byte)charValue;
-            buffer.putByte(this.offset + 3 + i, byteValue);
+            buffer.putByte(offset + 3 + i, byteValue);
         }
 
         for (int i = srcLength; i < length; ++i)
         {
-            buffer.putByte(this.offset + 3 + i, (byte)0);
+            buffer.putByte(offset + 3 + i, (byte)0);
         }
 
         return this;
@@ -379,14 +379,24 @@ public class EngineEncoder implements CompositeEncoderFlyweight
 
     public String toString()
     {
-        return appendTo(new StringBuilder(100)).toString();
+        if (null == buffer)
+        {
+            return "";
+        }
+
+        return appendTo(new StringBuilder()).toString();
     }
 
     public StringBuilder appendTo(final StringBuilder builder)
     {
-        EngineDecoder writer = new EngineDecoder();
-        writer.wrap(buffer, offset);
+        if (null == buffer)
+        {
+            return builder;
+        }
 
-        return writer.appendTo(builder);
+        final EngineDecoder decoder = new EngineDecoder();
+        decoder.wrap(buffer, offset);
+
+        return decoder.appendTo(builder);
     }
 }

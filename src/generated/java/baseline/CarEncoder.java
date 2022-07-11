@@ -1,9 +1,10 @@
-/* Generated SBE (Simple Binary Encoding) message codec */
+/* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
 import org.agrona.sbe.*;
+
 
 /**
  * Description of a basic Car
@@ -19,8 +20,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     private final CarEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    protected int offset;
-    protected int limit;
+    private int initialOffset;
+    private int offset;
+    private int limit;
 
     public int sbeBlockLength()
     {
@@ -52,6 +54,11 @@ public class CarEncoder implements MessageEncoderFlyweight
         return buffer;
     }
 
+    public int initialOffset()
+    {
+        return initialOffset;
+    }
+
     public int offset()
     {
         return offset;
@@ -63,6 +70,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         {
             this.buffer = buffer;
         }
+        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -119,12 +127,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String serialNumberMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -174,12 +179,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String modelYearMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -229,12 +231,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String availableMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -268,12 +267,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String codeMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -307,12 +303,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String someNumbersMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -346,7 +339,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             throw new IndexOutOfBoundsException("index out of range: index=" + index);
         }
 
-        final int pos = this.offset + 12 + (index * 4);
+        final int pos = offset + 12 + (index * 4);
         buffer.putInt(pos, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
 
         return this;
@@ -374,12 +367,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String vehicleCodeMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -413,7 +403,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             throw new IndexOutOfBoundsException("index out of range: index=" + index);
         }
 
-        final int pos = this.offset + 32 + (index * 1);
+        final int pos = offset + 32 + (index * 1);
         buffer.putByte(pos, value);
 
         return this;
@@ -432,7 +422,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             throw new IndexOutOfBoundsException("Copy will go out of range: offset=" + srcOffset);
         }
 
-        buffer.putBytes(this.offset + 32, src, srcOffset, length);
+        buffer.putBytes(offset + 32, src, srcOffset, length);
 
         return this;
     }
@@ -446,11 +436,11 @@ public class CarEncoder implements MessageEncoderFlyweight
             throw new IndexOutOfBoundsException("String too large for copy: byte length=" + srcLength);
         }
 
-        buffer.putStringWithoutLengthAscii(this.offset + 32, src);
+        buffer.putStringWithoutLengthAscii(offset + 32, src);
 
         for (int start = srcLength; start < length; ++start)
         {
-            buffer.putByte(this.offset + 32 + start, (byte)0);
+            buffer.putByte(offset + 32 + start, (byte)0);
         }
 
         return this;
@@ -469,12 +459,12 @@ public class CarEncoder implements MessageEncoderFlyweight
         {
             final char charValue = src.charAt(i);
             final byte byteValue = charValue > 127 ? (byte)'?' : (byte)charValue;
-            buffer.putByte(this.offset + 32 + i, byteValue);
+            buffer.putByte(offset + 32 + i, byteValue);
         }
 
         for (int i = srcLength; i < length; ++i)
         {
-            buffer.putByte(this.offset + 32 + i, (byte)0);
+            buffer.putByte(offset + 32 + i, (byte)0);
         }
 
         return this;
@@ -502,12 +492,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String extrasMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -543,12 +530,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String discountedModelMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "constant";
+            return "constant";
         }
 
         return "";
@@ -576,12 +560,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String engineMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -616,6 +597,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         private int count;
         private int index;
         private int offset;
+        private int initialLimit;
 
         FuelFiguresEncoder(final CarEncoder parentMessage)
         {
@@ -634,12 +616,35 @@ public class CarEncoder implements MessageEncoderFlyweight
                 this.buffer = buffer;
             }
 
-            index = -1;
+            index = 0;
             this.count = count;
             final int limit = parentMessage.limit();
+            initialLimit = limit;
             parentMessage.limit(limit + HEADER_SIZE);
-            buffer.putShort(limit + 0, (short)(int)6, java.nio.ByteOrder.LITTLE_ENDIAN);
-            buffer.putShort(limit + 2, (short)(int)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(limit + 0, (short)6, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(limit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+        }
+
+        public FuelFiguresEncoder next()
+        {
+            if (index >= count)
+            {
+                throw new java.util.NoSuchElementException();
+            }
+
+            offset = parentMessage.limit();
+            parentMessage.limit(offset + sbeBlockLength());
+            ++index;
+
+            return this;
+        }
+
+        public int resetCountToIndex()
+        {
+            count = index;
+            buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+
+            return count;
         }
 
         public static int sbeHeaderSize()
@@ -650,20 +655,6 @@ public class CarEncoder implements MessageEncoderFlyweight
         public static int sbeBlockLength()
         {
             return 6;
-        }
-
-        public FuelFiguresEncoder next()
-        {
-            if (index + 1 >= count)
-            {
-                throw new java.util.NoSuchElementException();
-            }
-
-            offset = parentMessage.limit();
-            parentMessage.limit(offset + sbeBlockLength());
-            ++index;
-
-            return this;
         }
 
         public static int speedId()
@@ -688,12 +679,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
         public static String speedMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "";
-                case TIME_UNIT: return "";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -743,12 +731,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
         public static String mpgMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "";
-                case TIME_UNIT: return "";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -788,12 +773,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
         public static String usageDescriptionMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "unix";
-                case TIME_UNIT: return "nanosecond";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -814,7 +796,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             final int headerLength = 4;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + headerLength + length);
-            buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
             buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
             return this;
@@ -830,7 +812,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             final int headerLength = 4;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + headerLength + length);
-            buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
             buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
             return this;
@@ -857,7 +839,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             final int headerLength = 4;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + headerLength + length);
-            buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
             buffer.putBytes(limit + headerLength, bytes, 0, length);
 
             return this;
@@ -885,6 +867,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         private int count;
         private int index;
         private int offset;
+        private int initialLimit;
         private final AccelerationEncoder acceleration;
 
         PerformanceFiguresEncoder(final CarEncoder parentMessage)
@@ -905,12 +888,35 @@ public class CarEncoder implements MessageEncoderFlyweight
                 this.buffer = buffer;
             }
 
-            index = -1;
+            index = 0;
             this.count = count;
             final int limit = parentMessage.limit();
+            initialLimit = limit;
             parentMessage.limit(limit + HEADER_SIZE);
-            buffer.putShort(limit + 0, (short)(int)1, java.nio.ByteOrder.LITTLE_ENDIAN);
-            buffer.putShort(limit + 2, (short)(int)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(limit + 0, (short)1, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(limit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+        }
+
+        public PerformanceFiguresEncoder next()
+        {
+            if (index >= count)
+            {
+                throw new java.util.NoSuchElementException();
+            }
+
+            offset = parentMessage.limit();
+            parentMessage.limit(offset + sbeBlockLength());
+            ++index;
+
+            return this;
+        }
+
+        public int resetCountToIndex()
+        {
+            count = index;
+            buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+
+            return count;
         }
 
         public static int sbeHeaderSize()
@@ -921,20 +927,6 @@ public class CarEncoder implements MessageEncoderFlyweight
         public static int sbeBlockLength()
         {
             return 1;
-        }
-
-        public PerformanceFiguresEncoder next()
-        {
-            if (index + 1 >= count)
-            {
-                throw new java.util.NoSuchElementException();
-            }
-
-            offset = parentMessage.limit();
-            parentMessage.limit(offset + sbeBlockLength());
-            ++index;
-
-            return this;
         }
 
         public static int octaneRatingId()
@@ -959,12 +951,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
         public static String octaneRatingMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "";
-                case TIME_UNIT: return "";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -1011,6 +1000,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             private int count;
             private int index;
             private int offset;
+            private int initialLimit;
 
             AccelerationEncoder(final CarEncoder parentMessage)
             {
@@ -1029,12 +1019,35 @@ public class CarEncoder implements MessageEncoderFlyweight
                     this.buffer = buffer;
                 }
 
-                index = -1;
+                index = 0;
                 this.count = count;
                 final int limit = parentMessage.limit();
+                initialLimit = limit;
                 parentMessage.limit(limit + HEADER_SIZE);
-                buffer.putShort(limit + 0, (short)(int)6, java.nio.ByteOrder.LITTLE_ENDIAN);
-                buffer.putShort(limit + 2, (short)(int)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+                buffer.putShort(limit + 0, (short)6, java.nio.ByteOrder.LITTLE_ENDIAN);
+                buffer.putShort(limit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+            }
+
+            public AccelerationEncoder next()
+            {
+                if (index >= count)
+                {
+                    throw new java.util.NoSuchElementException();
+                }
+
+                offset = parentMessage.limit();
+                parentMessage.limit(offset + sbeBlockLength());
+                ++index;
+
+                return this;
+            }
+
+            public int resetCountToIndex()
+            {
+                count = index;
+                buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+
+                return count;
             }
 
             public static int sbeHeaderSize()
@@ -1045,20 +1058,6 @@ public class CarEncoder implements MessageEncoderFlyweight
             public static int sbeBlockLength()
             {
                 return 6;
-            }
-
-            public AccelerationEncoder next()
-            {
-                if (index + 1 >= count)
-                {
-                    throw new java.util.NoSuchElementException();
-                }
-
-                offset = parentMessage.limit();
-                parentMessage.limit(offset + sbeBlockLength());
-                ++index;
-
-                return this;
             }
 
             public static int mphId()
@@ -1083,12 +1082,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
             public static String mphMetaAttribute(final MetaAttribute metaAttribute)
             {
-                switch (metaAttribute)
+                if (MetaAttribute.PRESENCE == metaAttribute)
                 {
-                    case EPOCH: return "";
-                    case TIME_UNIT: return "";
-                    case SEMANTIC_TYPE: return "";
-                    case PRESENCE: return "required";
+                    return "required";
                 }
 
                 return "";
@@ -1138,12 +1134,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
             public static String secondsMetaAttribute(final MetaAttribute metaAttribute)
             {
-                switch (metaAttribute)
+                if (MetaAttribute.PRESENCE == metaAttribute)
                 {
-                    case EPOCH: return "";
-                    case TIME_UNIT: return "";
-                    case SEMANTIC_TYPE: return "";
-                    case PRESENCE: return "required";
+                    return "required";
                 }
 
                 return "";
@@ -1185,12 +1178,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String manufacturerMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "unix";
-            case TIME_UNIT: return "nanosecond";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -1211,7 +1201,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1227,7 +1217,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1254,7 +1244,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, bytes, 0, length);
 
         return this;
@@ -1272,12 +1262,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String modelMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "unix";
-            case TIME_UNIT: return "nanosecond";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -1298,7 +1285,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1314,7 +1301,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1341,7 +1328,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, bytes, 0, length);
 
         return this;
@@ -1359,12 +1346,9 @@ public class CarEncoder implements MessageEncoderFlyweight
 
     public static String activationCodeMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "unix";
-            case TIME_UNIT: return "nanosecond";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -1385,7 +1369,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1401,7 +1385,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1428,23 +1412,32 @@ public class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, (int)length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
         buffer.putBytes(limit + headerLength, bytes, 0, length);
 
         return this;
     }
 
-
     public String toString()
     {
-        return appendTo(new StringBuilder(100)).toString();
+        if (null == buffer)
+        {
+            return "";
+        }
+
+        return appendTo(new StringBuilder()).toString();
     }
 
     public StringBuilder appendTo(final StringBuilder builder)
     {
-        CarDecoder writer = new CarDecoder();
-        writer.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
+        if (null == buffer)
+        {
+            return builder;
+        }
 
-        return writer.appendTo(builder);
+        final CarDecoder decoder = new CarDecoder();
+        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+
+        return decoder.appendTo(builder);
     }
 }

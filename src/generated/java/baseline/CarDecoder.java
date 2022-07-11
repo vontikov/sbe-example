@@ -1,9 +1,10 @@
-/* Generated SBE (Simple Binary Encoding) message codec */
+/* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
 import org.agrona.sbe.*;
+
 
 /**
  * Description of a basic Car
@@ -19,10 +20,11 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     private final CarDecoder parentMessage = this;
     private DirectBuffer buffer;
-    protected int offset;
-    protected int limit;
-    protected int actingBlockLength;
-    protected int actingVersion;
+    private int initialOffset;
+    private int offset;
+    private int limit;
+    int actingBlockLength;
+    int actingVersion;
 
     public int sbeBlockLength()
     {
@@ -54,6 +56,11 @@ public class CarDecoder implements MessageDecoderFlyweight
         return buffer;
     }
 
+    public int initialOffset()
+    {
+        return initialOffset;
+    }
+
     public int offset()
     {
         return offset;
@@ -69,6 +76,7 @@ public class CarDecoder implements MessageDecoderFlyweight
         {
             this.buffer = buffer;
         }
+        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
@@ -114,12 +122,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String serialNumberMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -168,12 +173,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String modelYearMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -222,12 +224,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String availableMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -261,12 +260,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String codeMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -300,12 +296,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String someNumbersMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -339,7 +332,7 @@ public class CarDecoder implements MessageDecoderFlyweight
             throw new IndexOutOfBoundsException("index out of range: index=" + index);
         }
 
-        final int pos = this.offset + 12 + (index * 4);
+        final int pos = offset + 12 + (index * 4);
 
         return (buffer.getInt(pos, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
     }
@@ -367,12 +360,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String vehicleCodeMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -406,7 +396,7 @@ public class CarDecoder implements MessageDecoderFlyweight
             throw new IndexOutOfBoundsException("index out of range: index=" + index);
         }
 
-        final int pos = this.offset + 32 + (index * 1);
+        final int pos = offset + 32 + (index * 1);
 
         return buffer.getByte(pos);
     }
@@ -425,7 +415,7 @@ public class CarDecoder implements MessageDecoderFlyweight
             throw new IndexOutOfBoundsException("Copy will go out of range: offset=" + dstOffset);
         }
 
-        buffer.getBytes(this.offset + 32, dst, dstOffset, length);
+        buffer.getBytes(offset + 32, dst, dstOffset, length);
 
         return length;
     }
@@ -433,7 +423,7 @@ public class CarDecoder implements MessageDecoderFlyweight
     public String vehicleCode()
     {
         final byte[] dst = new byte[6];
-        buffer.getBytes(this.offset + 32, dst, 0, 6);
+        buffer.getBytes(offset + 32, dst, 0, 6);
 
         int end = 0;
         for (; end < 6 && dst[end] != 0; ++end);
@@ -446,7 +436,7 @@ public class CarDecoder implements MessageDecoderFlyweight
     {
         for (int i = 0; i < 6; ++i)
         {
-            final int c = buffer.getByte(this.offset + 32 + i) & 0xFF;
+            final int c = buffer.getByte(offset + 32 + i) & 0xFF;
             if (c == 0)
             {
                 return i;
@@ -488,12 +478,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String extrasMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -529,12 +516,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String discountedModelMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "constant";
+            return "constant";
         }
 
         return "";
@@ -568,12 +552,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String engineMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "";
-            case TIME_UNIT: return "";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -627,11 +608,26 @@ public class CarDecoder implements MessageDecoderFlyweight
             {
                 this.buffer = buffer;
             }
-            index = -1;
+
+            index = 0;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + HEADER_SIZE);
-            blockLength = (int)(buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
-            count = (int)(buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            blockLength = (buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            count = (buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        }
+
+        public FuelFiguresDecoder next()
+        {
+            if (index >= count)
+            {
+                throw new java.util.NoSuchElementException();
+            }
+
+            offset = parentMessage.limit();
+            parentMessage.limit(offset + blockLength);
+            ++index;
+
+            return this;
         }
 
         public static int sbeHeaderSize()
@@ -666,21 +662,7 @@ public class CarDecoder implements MessageDecoderFlyweight
 
         public boolean hasNext()
         {
-            return (index + 1) < count;
-        }
-
-        public FuelFiguresDecoder next()
-        {
-            if (index + 1 >= count)
-            {
-                throw new java.util.NoSuchElementException();
-            }
-
-            offset = parentMessage.limit();
-            parentMessage.limit(offset + blockLength);
-            ++index;
-
-            return this;
+            return index < count;
         }
 
         public static int speedId()
@@ -705,12 +687,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
         public static String speedMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "";
-                case TIME_UNIT: return "";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -759,12 +738,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
         public static String mpgMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "";
-                case TIME_UNIT: return "";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -808,12 +784,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
         public static String usageDescriptionMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "unix";
-                case TIME_UNIT: return "nanosecond";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -836,7 +809,6 @@ public class CarDecoder implements MessageDecoderFlyweight
             final int limit = parentMessage.limit();
             final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
             final int dataOffset = limit + headerLength;
-
             parentMessage.limit(dataOffset + dataLength);
 
             return dataLength;
@@ -903,14 +875,13 @@ public class CarDecoder implements MessageDecoderFlyweight
             return value;
         }
 
-
-        public String toString()
-        {
-            return appendTo(new StringBuilder(100)).toString();
-        }
-
         public StringBuilder appendTo(final StringBuilder builder)
         {
+            if (null == buffer)
+            {
+                return builder;
+            }
+
             builder.append('(');
             builder.append("speed=");
             builder.append(speed());
@@ -921,6 +892,7 @@ public class CarDecoder implements MessageDecoderFlyweight
             builder.append("usageDescription=");
             builder.append('\'').append(usageDescription()).append('\'');
             builder.append(')');
+
             return builder;
         }
     }
@@ -967,11 +939,26 @@ public class CarDecoder implements MessageDecoderFlyweight
             {
                 this.buffer = buffer;
             }
-            index = -1;
+
+            index = 0;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + HEADER_SIZE);
-            blockLength = (int)(buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
-            count = (int)(buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            blockLength = (buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            count = (buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        }
+
+        public PerformanceFiguresDecoder next()
+        {
+            if (index >= count)
+            {
+                throw new java.util.NoSuchElementException();
+            }
+
+            offset = parentMessage.limit();
+            parentMessage.limit(offset + blockLength);
+            ++index;
+
+            return this;
         }
 
         public static int sbeHeaderSize()
@@ -1006,21 +993,7 @@ public class CarDecoder implements MessageDecoderFlyweight
 
         public boolean hasNext()
         {
-            return (index + 1) < count;
-        }
-
-        public PerformanceFiguresDecoder next()
-        {
-            if (index + 1 >= count)
-            {
-                throw new java.util.NoSuchElementException();
-            }
-
-            offset = parentMessage.limit();
-            parentMessage.limit(offset + blockLength);
-            ++index;
-
-            return this;
+            return index < count;
         }
 
         public static int octaneRatingId()
@@ -1045,12 +1018,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
         public static String octaneRatingMetaAttribute(final MetaAttribute metaAttribute)
         {
-            switch (metaAttribute)
+            if (MetaAttribute.PRESENCE == metaAttribute)
             {
-                case EPOCH: return "";
-                case TIME_UNIT: return "";
-                case SEMANTIC_TYPE: return "";
-                case PRESENCE: return "required";
+                return "required";
             }
 
             return "";
@@ -1115,11 +1085,26 @@ public class CarDecoder implements MessageDecoderFlyweight
                 {
                     this.buffer = buffer;
                 }
-                index = -1;
+
+                index = 0;
                 final int limit = parentMessage.limit();
                 parentMessage.limit(limit + HEADER_SIZE);
-                blockLength = (int)(buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
-                count = (int)(buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+                blockLength = (buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+                count = (buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            }
+
+            public AccelerationDecoder next()
+            {
+                if (index >= count)
+                {
+                    throw new java.util.NoSuchElementException();
+                }
+
+                offset = parentMessage.limit();
+                parentMessage.limit(offset + blockLength);
+                ++index;
+
+                return this;
             }
 
             public static int sbeHeaderSize()
@@ -1154,21 +1139,7 @@ public class CarDecoder implements MessageDecoderFlyweight
 
             public boolean hasNext()
             {
-                return (index + 1) < count;
-            }
-
-            public AccelerationDecoder next()
-            {
-                if (index + 1 >= count)
-                {
-                    throw new java.util.NoSuchElementException();
-                }
-
-                offset = parentMessage.limit();
-                parentMessage.limit(offset + blockLength);
-                ++index;
-
-                return this;
+                return index < count;
             }
 
             public static int mphId()
@@ -1193,12 +1164,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
             public static String mphMetaAttribute(final MetaAttribute metaAttribute)
             {
-                switch (metaAttribute)
+                if (MetaAttribute.PRESENCE == metaAttribute)
                 {
-                    case EPOCH: return "";
-                    case TIME_UNIT: return "";
-                    case SEMANTIC_TYPE: return "";
-                    case PRESENCE: return "required";
+                    return "required";
                 }
 
                 return "";
@@ -1247,12 +1215,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
             public static String secondsMetaAttribute(final MetaAttribute metaAttribute)
             {
-                switch (metaAttribute)
+                if (MetaAttribute.PRESENCE == metaAttribute)
                 {
-                    case EPOCH: return "";
-                    case TIME_UNIT: return "";
-                    case SEMANTIC_TYPE: return "";
-                    case PRESENCE: return "required";
+                    return "required";
                 }
 
                 return "";
@@ -1279,14 +1244,13 @@ public class CarDecoder implements MessageDecoderFlyweight
             }
 
 
-
-            public String toString()
-            {
-                return appendTo(new StringBuilder(100)).toString();
-            }
-
             public StringBuilder appendTo(final StringBuilder builder)
             {
+                if (null == buffer)
+                {
+                    return builder;
+                }
+
                 builder.append('(');
                 builder.append("mph=");
                 builder.append(mph());
@@ -1294,18 +1258,18 @@ public class CarDecoder implements MessageDecoderFlyweight
                 builder.append("seconds=");
                 builder.append(seconds());
                 builder.append(')');
+
                 return builder;
             }
         }
 
-
-        public String toString()
-        {
-            return appendTo(new StringBuilder(100)).toString();
-        }
-
         public StringBuilder appendTo(final StringBuilder builder)
         {
+            if (null == buffer)
+            {
+                return builder;
+            }
+
             builder.append('(');
             builder.append("octaneRating=");
             builder.append(octaneRating());
@@ -1323,6 +1287,7 @@ public class CarDecoder implements MessageDecoderFlyweight
             }
             builder.append(']');
             builder.append(')');
+
             return builder;
         }
     }
@@ -1344,12 +1309,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String manufacturerMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "unix";
-            case TIME_UNIT: return "nanosecond";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -1372,7 +1334,6 @@ public class CarDecoder implements MessageDecoderFlyweight
         final int limit = parentMessage.limit();
         final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
         final int dataOffset = limit + headerLength;
-
         parentMessage.limit(dataOffset + dataLength);
 
         return dataLength;
@@ -1456,12 +1417,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String modelMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "unix";
-            case TIME_UNIT: return "nanosecond";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -1484,7 +1442,6 @@ public class CarDecoder implements MessageDecoderFlyweight
         final int limit = parentMessage.limit();
         final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
         final int dataOffset = limit + headerLength;
-
         parentMessage.limit(dataOffset + dataLength);
 
         return dataLength;
@@ -1568,12 +1525,9 @@ public class CarDecoder implements MessageDecoderFlyweight
 
     public static String activationCodeMetaAttribute(final MetaAttribute metaAttribute)
     {
-        switch (metaAttribute)
+        if (MetaAttribute.PRESENCE == metaAttribute)
         {
-            case EPOCH: return "unix";
-            case TIME_UNIT: return "nanosecond";
-            case SEMANTIC_TYPE: return "";
-            case PRESENCE: return "required";
+            return "required";
         }
 
         return "";
@@ -1596,7 +1550,6 @@ public class CarDecoder implements MessageDecoderFlyweight
         final int limit = parentMessage.limit();
         final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
         final int dataOffset = limit + headerLength;
-
         parentMessage.limit(dataOffset + dataLength);
 
         return dataLength;
@@ -1663,16 +1616,28 @@ public class CarDecoder implements MessageDecoderFlyweight
         return value;
     }
 
-
     public String toString()
     {
-        return appendTo(new StringBuilder(100)).toString();
+        if (null == buffer)
+        {
+            return "";
+        }
+
+        final CarDecoder decoder = new CarDecoder();
+        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+
+        return decoder.appendTo(new StringBuilder()).toString();
     }
 
     public StringBuilder appendTo(final StringBuilder builder)
     {
+        if (null == buffer)
+        {
+            return builder;
+        }
+
         final int originalLimit = limit();
-        limit(offset + actingBlockLength);
+        limit(initialOffset + actingBlockLength);
         builder.append("[Car](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -1724,7 +1689,7 @@ public class CarDecoder implements MessageDecoderFlyweight
         }
         builder.append('|');
         builder.append("extras=");
-        builder.append(extras());
+        extras().appendTo(builder);
         builder.append('|');
         builder.append("discountedModel=");
         builder.append(discountedModel());

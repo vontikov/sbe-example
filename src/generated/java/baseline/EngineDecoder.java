@@ -1,4 +1,4 @@
-/* Generated SBE (Simple Binary Encoding) message codec */
+/* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
 import org.agrona.DirectBuffer;
@@ -201,7 +201,7 @@ public class EngineDecoder implements CompositeDecoderFlyweight
             throw new IndexOutOfBoundsException("index out of range: index=" + index);
         }
 
-        final int pos = this.offset + 3 + (index * 1);
+        final int pos = offset + 3 + (index * 1);
 
         return buffer.getByte(pos);
     }
@@ -220,7 +220,7 @@ public class EngineDecoder implements CompositeDecoderFlyweight
             throw new IndexOutOfBoundsException("Copy will go out of range: offset=" + dstOffset);
         }
 
-        buffer.getBytes(this.offset + 3, dst, dstOffset, length);
+        buffer.getBytes(offset + 3, dst, dstOffset, length);
 
         return length;
     }
@@ -228,7 +228,7 @@ public class EngineDecoder implements CompositeDecoderFlyweight
     public String manufacturerCode()
     {
         final byte[] dst = new byte[3];
-        buffer.getBytes(this.offset + 3, dst, 0, 3);
+        buffer.getBytes(offset + 3, dst, 0, 3);
 
         int end = 0;
         for (; end < 3 && dst[end] != 0; ++end);
@@ -241,7 +241,7 @@ public class EngineDecoder implements CompositeDecoderFlyweight
     {
         for (int i = 0; i < 3; ++i)
         {
-            final int c = buffer.getByte(this.offset + 3 + i) & 0xFF;
+            final int c = buffer.getByte(offset + 3 + i) & 0xFF;
             if (c == 0)
             {
                 return i;
@@ -401,11 +401,21 @@ public class EngineDecoder implements CompositeDecoderFlyweight
 
     public String toString()
     {
-        return appendTo(new StringBuilder(100)).toString();
+        if (null == buffer)
+        {
+            return "";
+        }
+
+        return appendTo(new StringBuilder()).toString();
     }
 
     public StringBuilder appendTo(final StringBuilder builder)
     {
+        if (null == buffer)
+        {
+            return builder;
+        }
+
         builder.append('(');
         builder.append("capacity=");
         builder.append(capacity());

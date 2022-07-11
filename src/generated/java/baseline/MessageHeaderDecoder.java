@@ -1,8 +1,9 @@
-/* Generated SBE (Simple Binary Encoding) message codec */
+/* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
 import org.agrona.DirectBuffer;
 import org.agrona.sbe.*;
+
 
 /**
  * Message identifiers and length of message root
@@ -200,11 +201,21 @@ public class MessageHeaderDecoder implements CompositeDecoderFlyweight
 
     public String toString()
     {
-        return appendTo(new StringBuilder(100)).toString();
+        if (null == buffer)
+        {
+            return "";
+        }
+
+        return appendTo(new StringBuilder()).toString();
     }
 
     public StringBuilder appendTo(final StringBuilder builder)
     {
+        if (null == buffer)
+        {
+            return builder;
+        }
+
         builder.append('(');
         builder.append("blockLength=");
         builder.append(blockLength());

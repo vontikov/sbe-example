@@ -1,8 +1,9 @@
-/* Generated SBE (Simple Binary Encoding) message codec */
+/* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
 import org.agrona.sbe.*;
+
 
 /**
  * Repeating group dimensions
@@ -120,14 +121,24 @@ public class GroupSizeEncodingEncoder implements CompositeEncoderFlyweight
 
     public String toString()
     {
-        return appendTo(new StringBuilder(100)).toString();
+        if (null == buffer)
+        {
+            return "";
+        }
+
+        return appendTo(new StringBuilder()).toString();
     }
 
     public StringBuilder appendTo(final StringBuilder builder)
     {
-        GroupSizeEncodingDecoder writer = new GroupSizeEncodingDecoder();
-        writer.wrap(buffer, offset);
+        if (null == buffer)
+        {
+            return builder;
+        }
 
-        return writer.appendTo(builder);
+        final GroupSizeEncodingDecoder decoder = new GroupSizeEncodingDecoder();
+        decoder.wrap(buffer, offset);
+
+        return decoder.appendTo(builder);
     }
 }
