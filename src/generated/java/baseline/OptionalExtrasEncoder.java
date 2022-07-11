@@ -5,7 +5,7 @@ import org.agrona.MutableDirectBuffer;
 import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public class OptionalExtrasEncoder implements Flyweight
+public final class OptionalExtrasEncoder implements Flyweight
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;

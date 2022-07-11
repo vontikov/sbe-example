@@ -9,7 +9,7 @@ import org.agrona.sbe.*;
  * Repeating group dimensions
  */
 @SuppressWarnings("all")
-public class GroupSizeEncodingDecoder implements CompositeDecoderFlyweight
+public final class GroupSizeEncodingDecoder implements CompositeDecoderFlyweight
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;

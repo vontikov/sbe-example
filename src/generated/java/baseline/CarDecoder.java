@@ -10,7 +10,7 @@ import org.agrona.sbe.*;
  * Description of a basic Car
  */
 @SuppressWarnings("all")
-public class CarDecoder implements MessageDecoderFlyweight
+public final class CarDecoder implements MessageDecoderFlyweight
 {
     public static final int BLOCK_LENGTH = 49;
     public static final int TEMPLATE_ID = 1;
@@ -83,6 +83,26 @@ public class CarDecoder implements MessageDecoderFlyweight
         limit(offset + actingBlockLength);
 
         return this;
+    }
+
+    public CarDecoder wrapAndApplyHeader(
+        final DirectBuffer buffer,
+        final int offset,
+        final MessageHeaderDecoder headerDecoder)
+    {
+        headerDecoder.wrap(buffer, offset);
+
+        final int templateId = headerDecoder.templateId();
+        if (TEMPLATE_ID != templateId)
+        {
+            throw new IllegalStateException("Invalid TEMPLATE_ID: " + templateId);
+        }
+
+        return wrap(
+            buffer,
+            offset + MessageHeaderDecoder.ENCODED_LENGTH,
+            headerDecoder.blockLength(),
+            headerDecoder.version());
     }
 
     public int encodedLength()
@@ -232,6 +252,11 @@ public class CarDecoder implements MessageDecoderFlyweight
         return "";
     }
 
+    public short availableRaw()
+    {
+        return ((short)(buffer.getByte(offset + 10) & 0xFF));
+    }
+
     public BooleanType available()
     {
         return BooleanType.get(((short)(buffer.getByte(offset + 10) & 0xFF)));
@@ -266,6 +291,11 @@ public class CarDecoder implements MessageDecoderFlyweight
         }
 
         return "";
+    }
+
+    public byte codeRaw()
+    {
+        return buffer.getByte(offset + 11);
     }
 
     public Model code()
@@ -524,6 +554,12 @@ public class CarDecoder implements MessageDecoderFlyweight
         return "";
     }
 
+    public byte discountedModelRaw()
+    {
+        return Model.C.value();
+    }
+
+
     public Model discountedModel()
     {
         return Model.C;
@@ -586,7 +622,7 @@ public class CarDecoder implements MessageDecoderFlyweight
         return fuelFigures;
     }
 
-    public static class FuelFiguresDecoder
+    public static final class FuelFiguresDecoder
         implements Iterable<FuelFiguresDecoder>, java.util.Iterator<FuelFiguresDecoder>
     {
         public static final int HEADER_SIZE = 4;
@@ -628,6 +664,16 @@ public class CarDecoder implements MessageDecoderFlyweight
             ++index;
 
             return this;
+        }
+
+        public static int countMinValue()
+        {
+            return 0;
+        }
+
+        public static int countMaxValue()
+        {
+            return 65534;
         }
 
         public static int sbeHeaderSize()
@@ -915,7 +961,7 @@ public class CarDecoder implements MessageDecoderFlyweight
         return performanceFigures;
     }
 
-    public static class PerformanceFiguresDecoder
+    public static final class PerformanceFiguresDecoder
         implements Iterable<PerformanceFiguresDecoder>, java.util.Iterator<PerformanceFiguresDecoder>
     {
         public static final int HEADER_SIZE = 4;
@@ -959,6 +1005,16 @@ public class CarDecoder implements MessageDecoderFlyweight
             ++index;
 
             return this;
+        }
+
+        public static int countMinValue()
+        {
+            return 0;
+        }
+
+        public static int countMaxValue()
+        {
+            return 65534;
         }
 
         public static int sbeHeaderSize()
@@ -1063,7 +1119,7 @@ public class CarDecoder implements MessageDecoderFlyweight
             return acceleration;
         }
 
-        public static class AccelerationDecoder
+        public static final class AccelerationDecoder
             implements Iterable<AccelerationDecoder>, java.util.Iterator<AccelerationDecoder>
         {
             public static final int HEADER_SIZE = 4;
@@ -1105,6 +1161,16 @@ public class CarDecoder implements MessageDecoderFlyweight
                 ++index;
 
                 return this;
+            }
+
+            public static int countMinValue()
+            {
+                return 0;
+            }
+
+            public static int countMaxValue()
+            {
+                return 65534;
             }
 
             public static int sbeHeaderSize()

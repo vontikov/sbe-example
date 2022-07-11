@@ -10,7 +10,7 @@ import org.agrona.sbe.*;
  * Description of a basic Car
  */
 @SuppressWarnings("all")
-public class CarEncoder implements MessageEncoderFlyweight
+public final class CarEncoder implements MessageEncoderFlyweight
 {
     public static final int BLOCK_LENGTH = 49;
     public static final int TEMPLATE_ID = 1;
@@ -589,7 +589,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         return fuelFigures;
     }
 
-    public static class FuelFiguresEncoder
+    public static final class FuelFiguresEncoder
     {
         public static final int HEADER_SIZE = 4;
         private final CarEncoder parentMessage;
@@ -645,6 +645,16 @@ public class CarEncoder implements MessageEncoderFlyweight
             buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
 
             return count;
+        }
+
+        public static int countMinValue()
+        {
+            return 0;
+        }
+
+        public static int countMaxValue()
+        {
+            return 65534;
         }
 
         public static int sbeHeaderSize()
@@ -859,7 +869,7 @@ public class CarEncoder implements MessageEncoderFlyweight
         return performanceFigures;
     }
 
-    public static class PerformanceFiguresEncoder
+    public static final class PerformanceFiguresEncoder
     {
         public static final int HEADER_SIZE = 4;
         private final CarEncoder parentMessage;
@@ -917,6 +927,16 @@ public class CarEncoder implements MessageEncoderFlyweight
             buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
 
             return count;
+        }
+
+        public static int countMinValue()
+        {
+            return 0;
+        }
+
+        public static int countMaxValue()
+        {
+            return 65534;
         }
 
         public static int sbeHeaderSize()
@@ -992,7 +1012,7 @@ public class CarEncoder implements MessageEncoderFlyweight
             return acceleration;
         }
 
-        public static class AccelerationEncoder
+        public static final class AccelerationEncoder
         {
             public static final int HEADER_SIZE = 4;
             private final CarEncoder parentMessage;
@@ -1048,6 +1068,16 @@ public class CarEncoder implements MessageEncoderFlyweight
                 buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
 
                 return count;
+            }
+
+            public static int countMinValue()
+            {
+                return 0;
+            }
+
+            public static int countMaxValue()
+            {
+                return 65534;
             }
 
             public static int sbeHeaderSize()

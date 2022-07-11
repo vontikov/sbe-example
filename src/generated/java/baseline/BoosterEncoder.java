@@ -5,7 +5,7 @@ import org.agrona.MutableDirectBuffer;
 import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public class BoosterEncoder implements CompositeEncoderFlyweight
+public final class BoosterEncoder implements CompositeEncoderFlyweight
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;

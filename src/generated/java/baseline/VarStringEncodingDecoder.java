@@ -5,7 +5,7 @@ import org.agrona.DirectBuffer;
 import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public class VarStringEncodingDecoder implements CompositeDecoderFlyweight
+public final class VarStringEncodingDecoder implements CompositeDecoderFlyweight
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;

@@ -9,7 +9,7 @@ import org.agrona.sbe.*;
  * Message identifiers and length of message root
  */
 @SuppressWarnings("all")
-public class MessageHeaderDecoder implements CompositeDecoderFlyweight
+public final class MessageHeaderDecoder implements CompositeDecoderFlyweight
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;

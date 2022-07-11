@@ -5,7 +5,7 @@ import org.agrona.DirectBuffer;
 import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public class EngineDecoder implements CompositeDecoderFlyweight
+public final class EngineDecoder implements CompositeDecoderFlyweight
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
@@ -368,6 +368,11 @@ public class EngineDecoder implements CompositeDecoderFlyweight
     public static int boosterEnabledSinceVersion()
     {
         return 0;
+    }
+
+    public short boosterEnabledRaw()
+    {
+        return ((short)(buffer.getByte(offset + 7) & 0xFF));
     }
 
     public BooleanType boosterEnabled()
