@@ -32,13 +32,17 @@ sourceSets {
   }
 }
 
+configurations {
+  extendedImplementation.extendsFrom implementation
+}
+
 task fatJar(type: Jar) {
   manifest {
     attributes 'Main-Class': 'uk.co.real_logic.sbe.examples.ExampleUsingGeneratedStub'
   }
   archiveClassifier = "all"
   from {
-    configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    configurations.extendedImplementation.collect { it.isDirectory() ? it : zipTree(it) }
     configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
   }
   with jar
