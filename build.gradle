@@ -1,6 +1,6 @@
 plugins {
   id 'application'
-  id "com.github.vontikov.sbe-generator-plugin" version "0.0.6"
+  id "com.github.vontikov.sbe-generator-plugin" version "0.0.7"
   id 'eclipse'
   id 'idea'
 }
@@ -46,7 +46,6 @@ task fatJar(type: Jar) {
   }
   archiveClassifier = "all"
   from {
-    configurations.extendedImplementation.collect { it.isDirectory() ? it : zipTree(it) }
     configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
   }
   with jar
