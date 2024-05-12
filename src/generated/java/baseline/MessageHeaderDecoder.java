@@ -2,17 +2,17 @@
 package baseline;
 
 import org.agrona.DirectBuffer;
-import org.agrona.sbe.*;
 
 
 /**
  * Message identifiers and length of message root
  */
 @SuppressWarnings("all")
-public final class MessageHeaderDecoder implements CompositeDecoderFlyweight
+public final class MessageHeaderDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = 8;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -87,7 +87,7 @@ public final class MessageHeaderDecoder implements CompositeDecoderFlyweight
 
     public int blockLength()
     {
-        return (buffer.getShort(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 0, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -123,7 +123,7 @@ public final class MessageHeaderDecoder implements CompositeDecoderFlyweight
 
     public int templateId()
     {
-        return (buffer.getShort(offset + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 2, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -159,7 +159,7 @@ public final class MessageHeaderDecoder implements CompositeDecoderFlyweight
 
     public int schemaId()
     {
-        return (buffer.getShort(offset + 4, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 4, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -195,7 +195,7 @@ public final class MessageHeaderDecoder implements CompositeDecoderFlyweight
 
     public int version()
     {
-        return (buffer.getShort(offset + 6, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 6, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -218,16 +218,16 @@ public final class MessageHeaderDecoder implements CompositeDecoderFlyweight
 
         builder.append('(');
         builder.append("blockLength=");
-        builder.append(blockLength());
+        builder.append(this.blockLength());
         builder.append('|');
         builder.append("templateId=");
-        builder.append(templateId());
+        builder.append(this.templateId());
         builder.append('|');
         builder.append("schemaId=");
-        builder.append(schemaId());
+        builder.append(this.schemaId());
         builder.append('|');
         builder.append("version=");
-        builder.append(version());
+        builder.append(this.version());
         builder.append(')');
 
         return builder;

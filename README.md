@@ -6,9 +6,9 @@
 | src/main/resources/sbe | SBE schemas  |
 | src/generated/java     | Java codecs  |
 
-# Generate codecs 
+# Generate codecs
 
-Java codecs should be generated time the SBE schema has changed
+Java codecs should be generated each time the SBE schema has changed
 
 ```
 gradle sbeGenerateJavaCodecs

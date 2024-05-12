@@ -3,24 +3,23 @@ package baseline;
 
 import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
-import org.agrona.sbe.*;
 
 
 /**
  * Description of a basic Car
  */
 @SuppressWarnings("all")
-public final class CarEncoder implements MessageEncoderFlyweight
+public final class CarEncoder
 {
     public static final int BLOCK_LENGTH = 49;
     public static final int TEMPLATE_ID = 1;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final CarEncoder parentMessage = this;
     private MutableDirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
 
@@ -54,11 +53,6 @@ public final class CarEncoder implements MessageEncoderFlyweight
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -70,7 +64,6 @@ public final class CarEncoder implements MessageEncoderFlyweight
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         limit(offset + BLOCK_LENGTH);
 
@@ -152,7 +145,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public CarEncoder serialNumber(final long value)
     {
-        buffer.putLong(offset + 0, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putLong(offset + 0, value, BYTE_ORDER);
         return this;
     }
 
@@ -204,7 +197,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public CarEncoder modelYear(final int value)
     {
-        buffer.putShort(offset + 8, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 8, (short)value, BYTE_ORDER);
         return this;
     }
 
@@ -340,7 +333,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         }
 
         final int pos = offset + 12 + (index * 4);
-        buffer.putInt(pos, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(pos, (int)value, BYTE_ORDER);
 
         return this;
     }
@@ -411,7 +404,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public static String vehicleCodeCharacterEncoding()
     {
-        return "ASCII";
+        return java.nio.charset.StandardCharsets.US_ASCII.name();
     }
 
     public CarEncoder putVehicleCode(final byte[] src, final int srcOffset)
@@ -455,16 +448,11 @@ public final class CarEncoder implements MessageEncoderFlyweight
             throw new IndexOutOfBoundsException("CharSequence too large for copy: byte length=" + srcLength);
         }
 
-        for (int i = 0; i < srcLength; ++i)
-        {
-            final char charValue = src.charAt(i);
-            final byte byteValue = charValue > 127 ? (byte)'?' : (byte)charValue;
-            buffer.putByte(offset + 32 + i, byteValue);
-        }
+        buffer.putStringWithoutLengthAscii(offset + 32, src);
 
-        for (int i = srcLength; i < length; ++i)
+        for (int start = srcLength; start < length; ++start)
         {
-            buffer.putByte(offset + 32 + i, (byte)0);
+            buffer.putByte(offset + 32 + start, (byte)0);
         }
 
         return this;
@@ -621,8 +609,8 @@ public final class CarEncoder implements MessageEncoderFlyweight
             final int limit = parentMessage.limit();
             initialLimit = limit;
             parentMessage.limit(limit + HEADER_SIZE);
-            buffer.putShort(limit + 0, (short)6, java.nio.ByteOrder.LITTLE_ENDIAN);
-            buffer.putShort(limit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(limit + 0, (short)6, BYTE_ORDER);
+            buffer.putShort(limit + 2, (short)count, BYTE_ORDER);
         }
 
         public FuelFiguresEncoder next()
@@ -642,7 +630,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         public int resetCountToIndex()
         {
             count = index;
-            buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(initialLimit + 2, (short)count, BYTE_ORDER);
 
             return count;
         }
@@ -714,7 +702,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
         public FuelFiguresEncoder speed(final int value)
         {
-            buffer.putShort(offset + 0, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(offset + 0, (short)value, BYTE_ORDER);
             return this;
         }
 
@@ -766,7 +754,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
         public FuelFiguresEncoder mpg(final float value)
         {
-            buffer.putFloat(offset + 2, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putFloat(offset + 2, value, BYTE_ORDER);
             return this;
         }
 
@@ -778,7 +766,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
         public static String usageDescriptionCharacterEncoding()
         {
-            return "UTF-8";
+            return java.nio.charset.StandardCharsets.UTF_8.name();
         }
 
         public static String usageDescriptionMetaAttribute(final MetaAttribute metaAttribute)
@@ -806,7 +794,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
             final int headerLength = 4;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + headerLength + length);
-            buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putInt(limit, length, BYTE_ORDER);
             buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
             return this;
@@ -822,7 +810,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
             final int headerLength = 4;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + headerLength + length);
-            buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putInt(limit, length, BYTE_ORDER);
             buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
             return this;
@@ -830,15 +818,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
         public FuelFiguresEncoder usageDescription(final String value)
         {
-            final byte[] bytes;
-            try
-            {
-                bytes = null == value || value.isEmpty() ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes("UTF-8");
-            }
-            catch (final java.io.UnsupportedEncodingException ex)
-            {
-                throw new RuntimeException(ex);
-            }
+            final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
             final int length = bytes.length;
             if (length > 1073741824)
@@ -849,7 +829,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
             final int headerLength = 4;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + headerLength + length);
-            buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putInt(limit, length, BYTE_ORDER);
             buffer.putBytes(limit + headerLength, bytes, 0, length);
 
             return this;
@@ -903,8 +883,8 @@ public final class CarEncoder implements MessageEncoderFlyweight
             final int limit = parentMessage.limit();
             initialLimit = limit;
             parentMessage.limit(limit + HEADER_SIZE);
-            buffer.putShort(limit + 0, (short)1, java.nio.ByteOrder.LITTLE_ENDIAN);
-            buffer.putShort(limit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(limit + 0, (short)1, BYTE_ORDER);
+            buffer.putShort(limit + 2, (short)count, BYTE_ORDER);
         }
 
         public PerformanceFiguresEncoder next()
@@ -924,7 +904,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         public int resetCountToIndex()
         {
             count = index;
-            buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+            buffer.putShort(initialLimit + 2, (short)count, BYTE_ORDER);
 
             return count;
         }
@@ -1044,8 +1024,8 @@ public final class CarEncoder implements MessageEncoderFlyweight
                 final int limit = parentMessage.limit();
                 initialLimit = limit;
                 parentMessage.limit(limit + HEADER_SIZE);
-                buffer.putShort(limit + 0, (short)6, java.nio.ByteOrder.LITTLE_ENDIAN);
-                buffer.putShort(limit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+                buffer.putShort(limit + 0, (short)6, BYTE_ORDER);
+                buffer.putShort(limit + 2, (short)count, BYTE_ORDER);
             }
 
             public AccelerationEncoder next()
@@ -1065,7 +1045,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
             public int resetCountToIndex()
             {
                 count = index;
-                buffer.putShort(initialLimit + 2, (short)count, java.nio.ByteOrder.LITTLE_ENDIAN);
+                buffer.putShort(initialLimit + 2, (short)count, BYTE_ORDER);
 
                 return count;
             }
@@ -1137,7 +1117,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
             public AccelerationEncoder mph(final int value)
             {
-                buffer.putShort(offset + 0, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+                buffer.putShort(offset + 0, (short)value, BYTE_ORDER);
                 return this;
             }
 
@@ -1189,7 +1169,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
             public AccelerationEncoder seconds(final float value)
             {
-                buffer.putFloat(offset + 2, value, java.nio.ByteOrder.LITTLE_ENDIAN);
+                buffer.putFloat(offset + 2, value, BYTE_ORDER);
                 return this;
             }
 
@@ -1203,7 +1183,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public static String manufacturerCharacterEncoding()
     {
-        return "UTF-8";
+        return java.nio.charset.StandardCharsets.UTF_8.name();
     }
 
     public static String manufacturerMetaAttribute(final MetaAttribute metaAttribute)
@@ -1231,7 +1211,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1247,7 +1227,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1255,15 +1235,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public CarEncoder manufacturer(final String value)
     {
-        final byte[] bytes;
-        try
-        {
-            bytes = null == value || value.isEmpty() ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes("UTF-8");
-        }
-        catch (final java.io.UnsupportedEncodingException ex)
-        {
-            throw new RuntimeException(ex);
-        }
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
         final int length = bytes.length;
         if (length > 1073741824)
@@ -1274,7 +1246,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, bytes, 0, length);
 
         return this;
@@ -1287,7 +1259,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public static String modelCharacterEncoding()
     {
-        return "UTF-8";
+        return java.nio.charset.StandardCharsets.UTF_8.name();
     }
 
     public static String modelMetaAttribute(final MetaAttribute metaAttribute)
@@ -1315,7 +1287,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1331,7 +1303,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1339,15 +1311,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public CarEncoder model(final String value)
     {
-        final byte[] bytes;
-        try
-        {
-            bytes = null == value || value.isEmpty() ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes("UTF-8");
-        }
-        catch (final java.io.UnsupportedEncodingException ex)
-        {
-            throw new RuntimeException(ex);
-        }
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
         final int length = bytes.length;
         if (length > 1073741824)
@@ -1358,7 +1322,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, bytes, 0, length);
 
         return this;
@@ -1371,7 +1335,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public static String activationCodeCharacterEncoding()
     {
-        return "UTF-8";
+        return java.nio.charset.StandardCharsets.UTF_8.name();
     }
 
     public static String activationCodeMetaAttribute(final MetaAttribute metaAttribute)
@@ -1399,7 +1363,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1415,7 +1379,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, src, srcOffset, length);
 
         return this;
@@ -1423,15 +1387,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
 
     public CarEncoder activationCode(final String value)
     {
-        final byte[] bytes;
-        try
-        {
-            bytes = null == value || value.isEmpty() ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes("UTF-8");
-        }
-        catch (final java.io.UnsupportedEncodingException ex)
-        {
-            throw new RuntimeException(ex);
-        }
+        final byte[] bytes = (null == value || value.isEmpty()) ? org.agrona.collections.ArrayUtil.EMPTY_BYTE_ARRAY : value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
         final int length = bytes.length;
         if (length > 1073741824)
@@ -1442,7 +1398,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         final int headerLength = 4;
         final int limit = parentMessage.limit();
         parentMessage.limit(limit + headerLength + length);
-        buffer.putInt(limit, length, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(limit, length, BYTE_ORDER);
         buffer.putBytes(limit + headerLength, bytes, 0, length);
 
         return this;
@@ -1466,7 +1422,7 @@ public final class CarEncoder implements MessageEncoderFlyweight
         }
 
         final CarDecoder decoder = new CarDecoder();
-        decoder.wrap(buffer, initialOffset, BLOCK_LENGTH, SCHEMA_VERSION);
+        decoder.wrap(buffer, offset, BLOCK_LENGTH, SCHEMA_VERSION);
 
         return decoder.appendTo(builder);
     }

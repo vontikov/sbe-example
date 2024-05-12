@@ -2,13 +2,13 @@
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
-import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public final class VarStringEncodingEncoder implements CompositeEncoderFlyweight
+public final class VarStringEncodingEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = -1;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -78,7 +78,7 @@ public final class VarStringEncodingEncoder implements CompositeEncoderFlyweight
 
     public VarStringEncodingEncoder length(final long value)
     {
-        buffer.putInt(offset + 0, (int)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putInt(offset + 0, (int)value, BYTE_ORDER);
         return this;
     }
 

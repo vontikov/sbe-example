@@ -2,13 +2,13 @@
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
-import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public final class EngineEncoder implements CompositeEncoderFlyweight
+public final class EngineEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = 10;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -78,7 +78,7 @@ public final class EngineEncoder implements CompositeEncoderFlyweight
 
     public EngineEncoder capacity(final int value)
     {
-        buffer.putShort(offset + 0, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 0, (short)value, BYTE_ORDER);
         return this;
     }
 
@@ -199,7 +199,7 @@ public final class EngineEncoder implements CompositeEncoderFlyweight
 
     public static String manufacturerCodeCharacterEncoding()
     {
-        return "US-ASCII";
+        return java.nio.charset.StandardCharsets.US_ASCII.name();
     }
 
     public EngineEncoder putManufacturerCode(final byte[] src, final int srcOffset)
@@ -243,16 +243,11 @@ public final class EngineEncoder implements CompositeEncoderFlyweight
             throw new IndexOutOfBoundsException("CharSequence too large for copy: byte length=" + srcLength);
         }
 
-        for (int i = 0; i < srcLength; ++i)
-        {
-            final char charValue = src.charAt(i);
-            final byte byteValue = charValue > 127 ? (byte)'?' : (byte)charValue;
-            buffer.putByte(offset + 3 + i, byteValue);
-        }
+        buffer.putStringWithoutLengthAscii(offset + 3, src);
 
-        for (int i = srcLength; i < length; ++i)
+        for (int start = srcLength; start < length; ++start)
         {
-            buffer.putByte(offset + 3 + i, (byte)0);
+            buffer.putByte(offset + 3 + start, (byte)0);
         }
 
         return this;

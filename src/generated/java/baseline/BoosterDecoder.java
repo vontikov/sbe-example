@@ -2,13 +2,13 @@
 package baseline;
 
 import org.agrona.DirectBuffer;
-import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public final class BoosterDecoder implements CompositeDecoderFlyweight
+public final class BoosterDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = 2;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -132,10 +132,10 @@ public final class BoosterDecoder implements CompositeDecoderFlyweight
 
         builder.append('(');
         builder.append("boostType=");
-        builder.append(boostType());
+        builder.append(this.boostType());
         builder.append('|');
         builder.append("horsePower=");
-        builder.append(horsePower());
+        builder.append(this.horsePower());
         builder.append(')');
 
         return builder;

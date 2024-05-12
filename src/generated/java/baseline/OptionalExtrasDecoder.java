@@ -2,13 +2,13 @@
 package baseline;
 
 import org.agrona.DirectBuffer;
-import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public final class OptionalExtrasDecoder implements Flyweight
+public final class OptionalExtrasDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = 1;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -54,6 +54,11 @@ public final class OptionalExtrasDecoder implements Flyweight
     public boolean isEmpty()
     {
         return 0 == buffer.getByte(offset);
+    }
+
+    public short getRaw()
+    {
+        return ((short)(buffer.getByte(offset) & 0xFF));
     }
 
     public boolean sunRoof()

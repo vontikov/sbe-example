@@ -2,17 +2,17 @@
 package baseline;
 
 import org.agrona.MutableDirectBuffer;
-import org.agrona.sbe.*;
 
 
 /**
  * Repeating group dimensions
  */
 @SuppressWarnings("all")
-public final class GroupSizeEncodingEncoder implements CompositeEncoderFlyweight
+public final class GroupSizeEncodingEncoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = 4;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -82,7 +82,7 @@ public final class GroupSizeEncodingEncoder implements CompositeEncoderFlyweight
 
     public GroupSizeEncodingEncoder blockLength(final int value)
     {
-        buffer.putShort(offset + 0, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 0, (short)value, BYTE_ORDER);
         return this;
     }
 
@@ -114,7 +114,7 @@ public final class GroupSizeEncodingEncoder implements CompositeEncoderFlyweight
 
     public GroupSizeEncodingEncoder numInGroup(final int value)
     {
-        buffer.putShort(offset + 2, (short)value, java.nio.ByteOrder.LITTLE_ENDIAN);
+        buffer.putShort(offset + 2, (short)value, BYTE_ORDER);
         return this;
     }
 

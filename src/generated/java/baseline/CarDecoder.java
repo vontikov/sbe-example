@@ -3,24 +3,23 @@ package baseline;
 
 import org.agrona.MutableDirectBuffer;
 import org.agrona.DirectBuffer;
-import org.agrona.sbe.*;
 
 
 /**
  * Description of a basic Car
  */
 @SuppressWarnings("all")
-public final class CarDecoder implements MessageDecoderFlyweight
+public final class CarDecoder
 {
     public static final int BLOCK_LENGTH = 49;
     public static final int TEMPLATE_ID = 1;
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
     private final CarDecoder parentMessage = this;
     private DirectBuffer buffer;
-    private int initialOffset;
     private int offset;
     private int limit;
     int actingBlockLength;
@@ -56,11 +55,6 @@ public final class CarDecoder implements MessageDecoderFlyweight
         return buffer;
     }
 
-    public int initialOffset()
-    {
-        return initialOffset;
-    }
-
     public int offset()
     {
         return offset;
@@ -76,7 +70,6 @@ public final class CarDecoder implements MessageDecoderFlyweight
         {
             this.buffer = buffer;
         }
-        this.initialOffset = offset;
         this.offset = offset;
         this.actingBlockLength = actingBlockLength;
         this.actingVersion = actingVersion;
@@ -103,6 +96,26 @@ public final class CarDecoder implements MessageDecoderFlyweight
             offset + MessageHeaderDecoder.ENCODED_LENGTH,
             headerDecoder.blockLength(),
             headerDecoder.version());
+    }
+
+    public CarDecoder sbeRewind()
+    {
+        return wrap(buffer, offset, actingBlockLength, actingVersion);
+    }
+
+    public int sbeDecodedLength()
+    {
+        final int currentLimit = limit();
+        sbeSkip();
+        final int decodedLength = encodedLength();
+        limit(currentLimit);
+
+        return decodedLength;
+    }
+
+    public int actingVersion()
+    {
+        return actingVersion;
     }
 
     public int encodedLength()
@@ -167,7 +180,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
     public long serialNumber()
     {
-        return buffer.getLong(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN);
+        return buffer.getLong(offset + 0, BYTE_ORDER);
     }
 
 
@@ -218,7 +231,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
     public int modelYear()
     {
-        return (buffer.getShort(offset + 8, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 8, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -364,7 +377,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
         final int pos = offset + 12 + (index * 4);
 
-        return (buffer.getInt(pos, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (buffer.getInt(pos, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
 
@@ -434,7 +447,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
     public static String vehicleCodeCharacterEncoding()
     {
-        return "ASCII";
+        return java.nio.charset.StandardCharsets.US_ASCII.name();
     }
 
     public int getVehicleCode(final byte[] dst, final int dstOffset)
@@ -648,8 +661,8 @@ public final class CarDecoder implements MessageDecoderFlyweight
             index = 0;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + HEADER_SIZE);
-            blockLength = (buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
-            count = (buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            blockLength = (buffer.getShort(limit + 0, BYTE_ORDER) & 0xFFFF);
+            count = (buffer.getShort(limit + 2, BYTE_ORDER) & 0xFFFF);
         }
 
         public FuelFiguresDecoder next()
@@ -758,7 +771,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
         public int speed()
         {
-            return (buffer.getShort(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            return (buffer.getShort(offset + 0, BYTE_ORDER) & 0xFFFF);
         }
 
 
@@ -809,7 +822,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
         public float mpg()
         {
-            return buffer.getFloat(offset + 2, java.nio.ByteOrder.LITTLE_ENDIAN);
+            return buffer.getFloat(offset + 2, BYTE_ORDER);
         }
 
 
@@ -825,7 +838,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
         public static String usageDescriptionCharacterEncoding()
         {
-            return "UTF-8";
+            return java.nio.charset.StandardCharsets.UTF_8.name();
         }
 
         public static String usageDescriptionMetaAttribute(final MetaAttribute metaAttribute)
@@ -846,14 +859,14 @@ public final class CarDecoder implements MessageDecoderFlyweight
         public int usageDescriptionLength()
         {
             final int limit = parentMessage.limit();
-            return (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+            return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         }
 
         public int skipUsageDescription()
         {
             final int headerLength = 4;
             final int limit = parentMessage.limit();
-            final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+            final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
             final int dataOffset = limit + headerLength;
             parentMessage.limit(dataOffset + dataLength);
 
@@ -864,7 +877,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         {
             final int headerLength = 4;
             final int limit = parentMessage.limit();
-            final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+            final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
             final int bytesCopied = Math.min(length, dataLength);
             parentMessage.limit(limit + headerLength + dataLength);
             buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -876,7 +889,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         {
             final int headerLength = 4;
             final int limit = parentMessage.limit();
-            final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+            final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
             final int bytesCopied = Math.min(length, dataLength);
             parentMessage.limit(limit + headerLength + dataLength);
             buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -888,7 +901,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         {
             final int headerLength = 4;
             final int limit = parentMessage.limit();
-            final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+            final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
             parentMessage.limit(limit + headerLength + dataLength);
             wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
         }
@@ -897,7 +910,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         {
             final int headerLength = 4;
             final int limit = parentMessage.limit();
-            final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+            final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
             parentMessage.limit(limit + headerLength + dataLength);
 
             if (0 == dataLength)
@@ -908,17 +921,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
             final byte[] tmp = new byte[dataLength];
             buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
 
-            final String value;
-            try
-            {
-                value = new String(tmp, "UTF-8");
-            }
-            catch (final java.io.UnsupportedEncodingException ex)
-            {
-                throw new RuntimeException(ex);
-            }
-
-            return value;
+            return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
         }
 
         public StringBuilder appendTo(final StringBuilder builder)
@@ -930,16 +933,23 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
             builder.append('(');
             builder.append("speed=");
-            builder.append(speed());
+            builder.append(this.speed());
             builder.append('|');
             builder.append("mpg=");
-            builder.append(mpg());
+            builder.append(this.mpg());
             builder.append('|');
             builder.append("usageDescription=");
             builder.append('\'').append(usageDescription()).append('\'');
             builder.append(')');
 
             return builder;
+        }
+        
+        public FuelFiguresDecoder sbeSkip()
+        {
+            skipUsageDescription();
+
+            return this;
         }
     }
 
@@ -989,8 +999,8 @@ public final class CarDecoder implements MessageDecoderFlyweight
             index = 0;
             final int limit = parentMessage.limit();
             parentMessage.limit(limit + HEADER_SIZE);
-            blockLength = (buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
-            count = (buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+            blockLength = (buffer.getShort(limit + 0, BYTE_ORDER) & 0xFFFF);
+            count = (buffer.getShort(limit + 2, BYTE_ORDER) & 0xFFFF);
         }
 
         public PerformanceFiguresDecoder next()
@@ -1145,8 +1155,8 @@ public final class CarDecoder implements MessageDecoderFlyweight
                 index = 0;
                 final int limit = parentMessage.limit();
                 parentMessage.limit(limit + HEADER_SIZE);
-                blockLength = (buffer.getShort(limit + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
-                count = (buffer.getShort(limit + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+                blockLength = (buffer.getShort(limit + 0, BYTE_ORDER) & 0xFFFF);
+                count = (buffer.getShort(limit + 2, BYTE_ORDER) & 0xFFFF);
             }
 
             public AccelerationDecoder next()
@@ -1255,7 +1265,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
             public int mph()
             {
-                return (buffer.getShort(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+                return (buffer.getShort(offset + 0, BYTE_ORDER) & 0xFFFF);
             }
 
 
@@ -1306,7 +1316,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
             public float seconds()
             {
-                return buffer.getFloat(offset + 2, java.nio.ByteOrder.LITTLE_ENDIAN);
+                return buffer.getFloat(offset + 2, BYTE_ORDER);
             }
 
 
@@ -1319,13 +1329,19 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
                 builder.append('(');
                 builder.append("mph=");
-                builder.append(mph());
+                builder.append(this.mph());
                 builder.append('|');
                 builder.append("seconds=");
-                builder.append(seconds());
+                builder.append(this.seconds());
                 builder.append(')');
 
                 return builder;
+            }
+            
+            public AccelerationDecoder sbeSkip()
+            {
+
+                return this;
             }
         }
 
@@ -1338,10 +1354,12 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
             builder.append('(');
             builder.append("octaneRating=");
-            builder.append(octaneRating());
+            builder.append(this.octaneRating());
             builder.append('|');
             builder.append("acceleration=[");
-            AccelerationDecoder acceleration = acceleration();
+            final int accelerationOriginalOffset = acceleration.offset;
+            final int accelerationOriginalIndex = acceleration.index;
+            final AccelerationDecoder acceleration = this.acceleration();
             if (acceleration.count() > 0)
             {
                 while (acceleration.hasNext())
@@ -1351,10 +1369,27 @@ public final class CarDecoder implements MessageDecoderFlyweight
                 }
                 builder.setLength(builder.length() - 1);
             }
+            acceleration.offset = accelerationOriginalOffset;
+            acceleration.index = accelerationOriginalIndex;
             builder.append(']');
             builder.append(')');
 
             return builder;
+        }
+        
+        public PerformanceFiguresDecoder sbeSkip()
+        {
+            AccelerationDecoder acceleration = this.acceleration();
+            if (acceleration.count() > 0)
+            {
+                while (acceleration.hasNext())
+                {
+                    acceleration.next();
+                    acceleration.sbeSkip();
+                }
+            }
+
+            return this;
         }
     }
 
@@ -1370,7 +1405,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
     public static String manufacturerCharacterEncoding()
     {
-        return "UTF-8";
+        return java.nio.charset.StandardCharsets.UTF_8.name();
     }
 
     public static String manufacturerMetaAttribute(final MetaAttribute metaAttribute)
@@ -1391,14 +1426,14 @@ public final class CarDecoder implements MessageDecoderFlyweight
     public int manufacturerLength()
     {
         final int limit = parentMessage.limit();
-        return (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
     public int skipManufacturer()
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int dataOffset = limit + headerLength;
         parentMessage.limit(dataOffset + dataLength);
 
@@ -1409,7 +1444,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int bytesCopied = Math.min(length, dataLength);
         parentMessage.limit(limit + headerLength + dataLength);
         buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -1421,7 +1456,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int bytesCopied = Math.min(length, dataLength);
         parentMessage.limit(limit + headerLength + dataLength);
         buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -1433,7 +1468,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         parentMessage.limit(limit + headerLength + dataLength);
         wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
     }
@@ -1442,7 +1477,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         parentMessage.limit(limit + headerLength + dataLength);
 
         if (0 == dataLength)
@@ -1453,17 +1488,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         final byte[] tmp = new byte[dataLength];
         buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
 
-        final String value;
-        try
-        {
-            value = new String(tmp, "UTF-8");
-        }
-        catch (final java.io.UnsupportedEncodingException ex)
-        {
-            throw new RuntimeException(ex);
-        }
-
-        return value;
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
     }
 
     public static int modelId()
@@ -1478,7 +1503,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
     public static String modelCharacterEncoding()
     {
-        return "UTF-8";
+        return java.nio.charset.StandardCharsets.UTF_8.name();
     }
 
     public static String modelMetaAttribute(final MetaAttribute metaAttribute)
@@ -1499,14 +1524,14 @@ public final class CarDecoder implements MessageDecoderFlyweight
     public int modelLength()
     {
         final int limit = parentMessage.limit();
-        return (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
     public int skipModel()
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int dataOffset = limit + headerLength;
         parentMessage.limit(dataOffset + dataLength);
 
@@ -1517,7 +1542,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int bytesCopied = Math.min(length, dataLength);
         parentMessage.limit(limit + headerLength + dataLength);
         buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -1529,7 +1554,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int bytesCopied = Math.min(length, dataLength);
         parentMessage.limit(limit + headerLength + dataLength);
         buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -1541,7 +1566,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         parentMessage.limit(limit + headerLength + dataLength);
         wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
     }
@@ -1550,7 +1575,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         parentMessage.limit(limit + headerLength + dataLength);
 
         if (0 == dataLength)
@@ -1561,17 +1586,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         final byte[] tmp = new byte[dataLength];
         buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
 
-        final String value;
-        try
-        {
-            value = new String(tmp, "UTF-8");
-        }
-        catch (final java.io.UnsupportedEncodingException ex)
-        {
-            throw new RuntimeException(ex);
-        }
-
-        return value;
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
     }
 
     public static int activationCodeId()
@@ -1586,7 +1601,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
 
     public static String activationCodeCharacterEncoding()
     {
-        return "UTF-8";
+        return java.nio.charset.StandardCharsets.UTF_8.name();
     }
 
     public static String activationCodeMetaAttribute(final MetaAttribute metaAttribute)
@@ -1607,14 +1622,14 @@ public final class CarDecoder implements MessageDecoderFlyweight
     public int activationCodeLength()
     {
         final int limit = parentMessage.limit();
-        return (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        return (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
     }
 
     public int skipActivationCode()
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int dataOffset = limit + headerLength;
         parentMessage.limit(dataOffset + dataLength);
 
@@ -1625,7 +1640,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int bytesCopied = Math.min(length, dataLength);
         parentMessage.limit(limit + headerLength + dataLength);
         buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -1637,7 +1652,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         final int bytesCopied = Math.min(length, dataLength);
         parentMessage.limit(limit + headerLength + dataLength);
         buffer.getBytes(limit + headerLength, dst, dstOffset, bytesCopied);
@@ -1649,7 +1664,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         parentMessage.limit(limit + headerLength + dataLength);
         wrapBuffer.wrap(buffer, limit + headerLength, dataLength);
     }
@@ -1658,7 +1673,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
     {
         final int headerLength = 4;
         final int limit = parentMessage.limit();
-        final int dataLength = (int)(buffer.getInt(limit, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF_FFFFL);
+        final int dataLength = (int)(buffer.getInt(limit, BYTE_ORDER) & 0xFFFF_FFFFL);
         parentMessage.limit(limit + headerLength + dataLength);
 
         if (0 == dataLength)
@@ -1669,17 +1684,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         final byte[] tmp = new byte[dataLength];
         buffer.getBytes(limit + headerLength, tmp, 0, dataLength);
 
-        final String value;
-        try
-        {
-            value = new String(tmp, "UTF-8");
-        }
-        catch (final java.io.UnsupportedEncodingException ex)
-        {
-            throw new RuntimeException(ex);
-        }
-
-        return value;
+        return new String(tmp, java.nio.charset.StandardCharsets.UTF_8);
     }
 
     public String toString()
@@ -1690,7 +1695,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         }
 
         final CarDecoder decoder = new CarDecoder();
-        decoder.wrap(buffer, initialOffset, actingBlockLength, actingVersion);
+        decoder.wrap(buffer, offset, actingBlockLength, actingVersion);
 
         return decoder.appendTo(new StringBuilder()).toString();
     }
@@ -1703,7 +1708,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         }
 
         final int originalLimit = limit();
-        limit(initialOffset + actingBlockLength);
+        limit(offset + actingBlockLength);
         builder.append("[Car](sbeTemplateId=");
         builder.append(TEMPLATE_ID);
         builder.append("|sbeSchemaId=");
@@ -1724,16 +1729,16 @@ public final class CarDecoder implements MessageDecoderFlyweight
         builder.append(BLOCK_LENGTH);
         builder.append("):");
         builder.append("serialNumber=");
-        builder.append(serialNumber());
+        builder.append(this.serialNumber());
         builder.append('|');
         builder.append("modelYear=");
-        builder.append(modelYear());
+        builder.append(this.modelYear());
         builder.append('|');
         builder.append("available=");
-        builder.append(available());
+        builder.append(this.available());
         builder.append('|');
         builder.append("code=");
-        builder.append(code());
+        builder.append(this.code());
         builder.append('|');
         builder.append("someNumbers=");
         builder.append('[');
@@ -1741,7 +1746,7 @@ public final class CarDecoder implements MessageDecoderFlyweight
         {
             for (int i = 0; i < someNumbersLength(); i++)
             {
-                builder.append(someNumbers(i));
+                builder.append(this.someNumbers(i));
                 builder.append(',');
             }
             builder.setLength(builder.length() - 1);
@@ -1749,20 +1754,28 @@ public final class CarDecoder implements MessageDecoderFlyweight
         builder.append(']');
         builder.append('|');
         builder.append("vehicleCode=");
-        for (int i = 0; i < vehicleCodeLength() && vehicleCode(i) > 0; i++)
+        for (int i = 0; i < vehicleCodeLength() && this.vehicleCode(i) > 0; i++)
         {
-            builder.append((char)vehicleCode(i));
+            builder.append((char)this.vehicleCode(i));
         }
         builder.append('|');
         builder.append("extras=");
-        extras().appendTo(builder);
+        final OptionalExtrasDecoder extras = this.extras();
+        if (null != extras)
+        {
+            extras.appendTo(builder);
+        }
+        else
+        {
+            builder.append("null");
+        }
         builder.append('|');
         builder.append("discountedModel=");
-        builder.append(discountedModel());
+        builder.append(this.discountedModel());
         builder.append('|');
         builder.append("engine=");
-        final EngineDecoder engine = engine();
-        if (engine != null)
+        final EngineDecoder engine = this.engine();
+        if (null != engine)
         {
             engine.appendTo(builder);
         }
@@ -1772,7 +1785,9 @@ public final class CarDecoder implements MessageDecoderFlyweight
         }
         builder.append('|');
         builder.append("fuelFigures=[");
-        FuelFiguresDecoder fuelFigures = fuelFigures();
+        final int fuelFiguresOriginalOffset = fuelFigures.offset;
+        final int fuelFiguresOriginalIndex = fuelFigures.index;
+        final FuelFiguresDecoder fuelFigures = this.fuelFigures();
         if (fuelFigures.count() > 0)
         {
             while (fuelFigures.hasNext())
@@ -1782,10 +1797,14 @@ public final class CarDecoder implements MessageDecoderFlyweight
             }
             builder.setLength(builder.length() - 1);
         }
+        fuelFigures.offset = fuelFiguresOriginalOffset;
+        fuelFigures.index = fuelFiguresOriginalIndex;
         builder.append(']');
         builder.append('|');
         builder.append("performanceFigures=[");
-        PerformanceFiguresDecoder performanceFigures = performanceFigures();
+        final int performanceFiguresOriginalOffset = performanceFigures.offset;
+        final int performanceFiguresOriginalIndex = performanceFigures.index;
+        final PerformanceFiguresDecoder performanceFigures = this.performanceFigures();
         if (performanceFigures.count() > 0)
         {
             while (performanceFigures.hasNext())
@@ -1795,6 +1814,8 @@ public final class CarDecoder implements MessageDecoderFlyweight
             }
             builder.setLength(builder.length() - 1);
         }
+        performanceFigures.offset = performanceFiguresOriginalOffset;
+        performanceFigures.index = performanceFiguresOriginalIndex;
         builder.append(']');
         builder.append('|');
         builder.append("manufacturer=");
@@ -1809,5 +1830,33 @@ public final class CarDecoder implements MessageDecoderFlyweight
         limit(originalLimit);
 
         return builder;
+    }
+    
+    public CarDecoder sbeSkip()
+    {
+        sbeRewind();
+        FuelFiguresDecoder fuelFigures = this.fuelFigures();
+        if (fuelFigures.count() > 0)
+        {
+            while (fuelFigures.hasNext())
+            {
+                fuelFigures.next();
+                fuelFigures.sbeSkip();
+            }
+        }
+        PerformanceFiguresDecoder performanceFigures = this.performanceFigures();
+        if (performanceFigures.count() > 0)
+        {
+            while (performanceFigures.hasNext())
+            {
+                performanceFigures.next();
+                performanceFigures.sbeSkip();
+            }
+        }
+        skipManufacturer();
+        skipModel();
+        skipActivationCode();
+
+        return this;
     }
 }

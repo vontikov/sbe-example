@@ -1,6 +1,7 @@
 /* Generated SBE (Simple Binary Encoding) message codec. */
 package baseline;
 
+@SuppressWarnings("all")
 public enum BooleanType
 {
     F((short)0),

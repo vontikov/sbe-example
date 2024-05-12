@@ -2,13 +2,13 @@
 package baseline;
 
 import org.agrona.DirectBuffer;
-import org.agrona.sbe.*;
 
 @SuppressWarnings("all")
-public final class EngineDecoder implements CompositeDecoderFlyweight
+public final class EngineDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = 10;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -83,7 +83,7 @@ public final class EngineDecoder implements CompositeDecoderFlyweight
 
     public int capacity()
     {
-        return (buffer.getShort(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 0, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -209,7 +209,7 @@ public final class EngineDecoder implements CompositeDecoderFlyweight
 
     public static String manufacturerCodeCharacterEncoding()
     {
-        return "US-ASCII";
+        return java.nio.charset.StandardCharsets.US_ASCII.name();
     }
 
     public int getManufacturerCode(final byte[] dst, final int dstOffset)
@@ -423,26 +423,26 @@ public final class EngineDecoder implements CompositeDecoderFlyweight
 
         builder.append('(');
         builder.append("capacity=");
-        builder.append(capacity());
+        builder.append(this.capacity());
         builder.append('|');
         builder.append("numCylinders=");
-        builder.append(numCylinders());
+        builder.append(this.numCylinders());
         builder.append('|');
         builder.append("manufacturerCode=");
-        for (int i = 0; i < manufacturerCodeLength() && manufacturerCode(i) > 0; i++)
+        for (int i = 0; i < manufacturerCodeLength() && this.manufacturerCode(i) > 0; i++)
         {
-            builder.append((char)manufacturerCode(i));
+            builder.append((char)this.manufacturerCode(i));
         }
         builder.append('|');
         builder.append("efficiency=");
-        builder.append(efficiency());
+        builder.append(this.efficiency());
         builder.append('|');
         builder.append("boosterEnabled=");
-        builder.append(boosterEnabled());
+        builder.append(this.boosterEnabled());
         builder.append('|');
         builder.append("booster=");
-        final BoosterDecoder booster = booster();
-        if (booster != null)
+        final BoosterDecoder booster = this.booster();
+        if (null != booster)
         {
             booster.appendTo(builder);
         }

@@ -2,17 +2,17 @@
 package baseline;
 
 import org.agrona.DirectBuffer;
-import org.agrona.sbe.*;
 
 
 /**
  * Repeating group dimensions
  */
 @SuppressWarnings("all")
-public final class GroupSizeEncodingDecoder implements CompositeDecoderFlyweight
+public final class GroupSizeEncodingDecoder
 {
     public static final int SCHEMA_ID = 1;
     public static final int SCHEMA_VERSION = 0;
+    public static final String SEMANTIC_VERSION = "5.2";
     public static final int ENCODED_LENGTH = 4;
     public static final java.nio.ByteOrder BYTE_ORDER = java.nio.ByteOrder.LITTLE_ENDIAN;
 
@@ -87,7 +87,7 @@ public final class GroupSizeEncodingDecoder implements CompositeDecoderFlyweight
 
     public int blockLength()
     {
-        return (buffer.getShort(offset + 0, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 0, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -123,7 +123,7 @@ public final class GroupSizeEncodingDecoder implements CompositeDecoderFlyweight
 
     public int numInGroup()
     {
-        return (buffer.getShort(offset + 2, java.nio.ByteOrder.LITTLE_ENDIAN) & 0xFFFF);
+        return (buffer.getShort(offset + 2, BYTE_ORDER) & 0xFFFF);
     }
 
 
@@ -146,10 +146,10 @@ public final class GroupSizeEncodingDecoder implements CompositeDecoderFlyweight
 
         builder.append('(');
         builder.append("blockLength=");
-        builder.append(blockLength());
+        builder.append(this.blockLength());
         builder.append('|');
         builder.append("numInGroup=");
-        builder.append(numInGroup());
+        builder.append(this.numInGroup());
         builder.append(')');
 
         return builder;
